@@ -13,7 +13,7 @@ DROP_COLS_OPT = [
 ]
 
 D_AGG_CALCULATION = {
-    "peer_name": "first",
+    "name": "first",
     "group_name": "first",
     "research_information_gathering": "mean",
     "creative_input": "mean",

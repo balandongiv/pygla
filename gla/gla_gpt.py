@@ -26,7 +26,8 @@ def extract_each_peers(df, dcols, std_col):
 
 def collapse_cols_representation(df, cols):
     """
-    This function extracts specific columns from a given dataframe, concatenates them, and extracts digits from the concatenated column.
+    This function extracts specific columns from a given dataframe, concatenates them, and extracts digits
+     from the concatenated column.
 
     Parameters:
     - df (pandas dataframe): The dataframe that needs to be processed
@@ -60,6 +61,9 @@ def read_file_transform(finput=None):
     Note:
     - The input dataframe should have the columns: name, group_name, peer_name, peer_student_id, research_information_gathering, creative_input, coperation_within_group, communication, contribution_quality, meeting_attendance, justification.
     - If the input dataframe is less than 13 columns, it is assumed that it is in the correct format for further processing.
+
+
+
     """
     df = pd.read_excel(finput)
     cols = df.columns.tolist()
