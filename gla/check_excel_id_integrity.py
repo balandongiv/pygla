@@ -7,7 +7,16 @@ To check if the student ID is duplicated or not
 
 def read_file(finput=None):
 
+    """
+    This function reads in a file and performs data transformations to filter and group the data.
 
+    Parameters:
+
+    finput (str, optional): The location and name of the excel file. Default is None
+    Returns:
+
+    pandas dataframe: The processed dataframe
+    """
     df=pd.read_excel(finput)
     df = df.filter(regex='Peers Student.*')
     indices_s = df.columns.get_indexer(df.columns[df.columns.str.contains('Peers Student')])
