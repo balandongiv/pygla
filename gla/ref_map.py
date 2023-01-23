@@ -1,19 +1,21 @@
-DROP_COLS_OPT = [
-    "dgroup_name",
-    ("percentage_trans", "research_information_gathering"),
-    ("percentage_trans", "creative_input"),
-    ("percentage_trans", "cooperation_within_group"),
-    ("percentage_trans", "communication"),
-    ("percentage_trans", "contribution_quality"),
-    ("percentage_trans", "meeting_attendance"),
-    "sum_percentage_all_elements",
-    "row_const",
-    "group_summation",
-    "nmember"
+COLS_OPT = [
+    ['std_name',
+     'research_information_gathering',
+     'creative_input',
+     'cooperation_within_group',
+     'communication',
+     'contribution_quality',
+     'meeting_attendance',
+     'dgroup_name',
+     'nmember',
+     'weightage',
+     'justification_annom',
+     'feedback'
+     ]
 ]
 
 D_AGG_CALCULATION = {
-    "name": "first",
+    "peer_name": "first",
     "group_name": "first",
     "research_information_gathering": "mean",
     "creative_input": "mean",
