@@ -1,10 +1,12 @@
 import pandas as pd
 from itertools import product
-# produce a more compact, efficient, PEP-compliant code using the following python code?
-# improve the current docstring but maintain the meaning of the old docstring
+
 from gla.ref_map import CONST_VAL, COL_NAME, N_ELEMENT, D_AGG_CALCULATION, DROP_COLS_OPT
 
+import argparse
 
+# produce a more compact, efficient, PEP-compliant code using the following python code?
+# improve the current docstring but maintain the meaning of the old docstring
 def extract_each_peers(df, dcols, std_col):
     """
     This function extracts specific columns from a given dataframe and renames the columns.
@@ -236,8 +238,30 @@ def calculate_factors(df_raw, scale_type):
 
     return df
 
+def create_parser():
+    parser = argparse.ArgumentParser(description='Process peer assessment data')
+    parser.add_argument('finput', type=str, help='file name of the excel file to be processed')
+    parser.add_argument('-v', '--verbose', action='store_true', help='include additional information in the output file')
+    parser.add_argument('-f', '--fname', type=str, default='result.xlsx', help='output file name')
+    parser.add_argument('-s', '--scale_type', type=int, default=5, choices=[5,7], help='scale type for normalization')
+    return parser
+
+# if __name__ == '__main__':
+#
+#     """
+#     This script reads an excel file, processes the dataframe using the read_file_transform function, checks for missing information using the check_missing_infomation function, normalizes the values using the calculate_factors function, and saves the output in an excel file.
+#     """
+#
+#     parser = create_parser()
+#     args = parser.parse_args()
+#     df = read_file_transform(args.finput)
+#     df = check_missing_infomation(df)
+#     df1 = calculate_factors(df, scale_type=args.scale_type)
+#
+#     save_output_excel(df1, fname=args.fname, verbose=args.verbose)
 
 if __name__ == '__main__':
+
     # fexcel=r'C:\Users\balandongiv\IdeaProjects\krr\peer_assessment\peer_assessment.xlsx'
     # fexcel = r'C:\Users\balandongiv\IdeaProjects\krr\peer_assessment\peer_assessment_7_scale.xlsx'
     # fexcel = r'C:\Users\balandongiv\IdeaProjects\krr\peer_assessment\peer_transform.xlsx'
