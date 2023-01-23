@@ -1,18 +1,42 @@
 import pandas as pd
 from itertools import product
 # produce a more compact, efficient, PEP-compliant code using the following python code?
-from gla.ref_map import CONST_VAL,COL_NAME,N_ELEMENT,D_AGG_CALCULATION,DROP_COLS_OPT
+# improve the current docstring but maintain the meaning of the old docstring
+from gla.ref_map import CONST_VAL, COL_NAME, N_ELEMENT, D_AGG_CALCULATION, DROP_COLS_OPT
 
 
 def extract_each_peers(df, dcols, std_col):
+    """
+    This function extracts specific columns from a given dataframe and renames the columns.
+
+    Parameters:
+    - df (pandas dataframe): The dataframe that needs to be processed
+    - dcols (list): A list of column indices that need to be extracted from the dataframe
+    - std_col (list): A list of column indices that will be included in the extracted dataframe along with dcols
+
+    Returns:
+    - pandas dataframe: The extracted dataframe with renamed columns.
+
+    """
     expanded_col = std_col + dcols
     return df.iloc[:, expanded_col].rename(columns=COL_NAME)
 
 
 def collapse_cols_representation(df, cols):
+    """
+    This function extracts specific columns from a given dataframe, concatenates them, and extracts digits from the concatenated column.
+
+    Parameters:
+    - df (pandas dataframe): The dataframe that needs to be processed
+    - cols (list): A list of column names in the dataframe
+
+    Returns:
+    - pandas dataframe: The processed dataframe
+
+    """
     indices_s = [i for i, s in enumerate(cols) if 'Peer Name' in s]
     indices_e = [i for i, s in enumerate(cols) if 'Justification for Peer' in s]
-    indices_e = [x+1 for x in indices_e]
+    indices_e = [x + 1 for x in indices_e]
     col_int = [range(start, end) for start, end in zip(indices_s, indices_e)]
     std_col = range(0, indices_s[0])
     all_df = [extract_each_peers(df, dcols, std_col) for dcols in col_int]
@@ -21,45 +45,63 @@ def collapse_cols_representation(df, cols):
         df1[delement] = df1[delement].str.extract('\((\d+)\)')
     return df1
 
+
 def read_file_transform(finput=None):
-    '''
+    """
 
+    Parameters:
+    - finput (str): The file name of the excel file that needs to be processed.
 
-    The else statment imply: manually data entry into the required cols format
-    name	group_name	peer_name	peer_student_id	research_information_gathering	creative_input	coperation_within_group	communication	contribution_quality	meeting_attendance	justification
+    Returns:
+    - pandas dataframe: The processed dataframe.
 
-
-    :param finput:
-    :return:
-    '''
+    Note:
+    - The input dataframe should have the columns: name, group_name, peer_name, peer_student_id, research_information_gathering, creative_input, coperation_within_group, communication, contribution_quality, meeting_attendance, justification.
+    - If the input dataframe is less than 13 columns, it is assumed that it is in the correct format for further processing.
+    """
     df = pd.read_excel(finput)
     cols = df.columns.tolist()
     return collapse_cols_representation(df, cols) if len(cols) > 13 else df
 
 
-
-
 def convert_percentage_weightage(df, scale_type=None):
     """
-    Currently, the code only has been tested for scale 5 and 7
-    As per previous practice, Terrible (0) would not yield any grade
-            # minus 1 since we dont want to assign any mark to the lowest point
-        # There can be 5 points scale or 7 points scale. Therefore, the value revise_max_val can be either 5 or 4
+        Normalizes the values of specific columns in a given dataframe using a given scale.
+        The function has been tested for scale 5 and 7 and by default, the lowest point "Terrible (0)" will not yield any grade.
+        The scale type can be either 5 or 7.
 
-    :param df:
-    :param scale_type:
-    :return:
-    """
+        Parameters:
+        - df (pandas dataframe): The dataframe that needs to be processed
+        - scale_type (int): The type of scale to be used (5 or 7)
+
+        Returns:
+        - pandas dataframe: The processed dataframe
+        """
 
     if scale_type not in (5, 7):
-        raise ValueError('Please input a valid scale type: 5 or 7, to avoid normalization error' )
+        raise ValueError('Please input a valid scale type: 5 or 7, to avoid normalization error')
     revise_max_val = 6 if scale_type == 7 else 4
     cols = pd.Index(CONST_VAL.keys())
     mi = pd.MultiIndex.from_product([['percentage_trans'], cols])
     df[mi] = df[cols] * pd.Series(CONST_VAL) / revise_max_val
     return df
 
+
 def re_arrange_justification(df, n_element):
+
+    """
+ This function processes the dataframe by creating a new column 'feedback', modifying the 'justification' column,
+ setting the index, and converting the specific column to integer.
+
+ Parameters:
+ - df (pandas dataframe): The dataframe that needs to be processed
+ - n_element (str): The name of the column that needs to be converted to integer
+
+ Returns:
+ - pandas dataframe: The processed dataframe
+
+ """
+
     df["feedback"] = df["name"].str.cat(df["justification"], sep="-->")
     df["justification"] = "'" + df["justification"].astype(str) + "'"
     df = df.set_index(["peer_student_id", "assessor_student_id"])
@@ -71,12 +113,35 @@ def re_arrange_justification(df, n_element):
 
 
 def group_stat(df):
+    """
+   This function groups the dataframe by a specific column, performs aggregation and renames the column.
+
+   Parameters:
+   - df (pandas dataframe): The dataframe that needs to be processed
+
+   Returns:
+   - pandas dataframe: The processed dataframe
+
+   """
     df_stat = df.groupby(level=0).agg({'row_const': 'sum',
-                                       'sum_percentage_all_elements': 'sum'}).reset_index().rename(columns={'index': 'group_name'})
+                                       'sum_percentage_all_elements': 'sum'}).reset_index().rename(
+        columns={'index': 'group_name'})
     return df_stat
 
 
 def calculate_factor(df, df_stat):
+    """
+
+
+ This function maps values of one dataframe column to another dataframe column based on a condition.
+
+    Parameters:
+    - df (pandas dataframe): The dataframe that needs to be processed
+    - df_stat (pandas dataframe): The dataframe that will be used as a reference for the mapping
+
+    Returns:
+    - pandas dataframe: The processed dataframe
+    """
     # https://stackoverflow.com/questions/70004051/assign-values-of-one-dataframe-column-to-another-dataframe-column-based-on-condi?rq=1
     mapping = df_stat.set_index('group_name').to_dict()
     df['group_summation'] = df['dgroup_name'].map(mapping['sum_percentage_all_elements']).fillna(0)
@@ -85,10 +150,23 @@ def calculate_factor(df, df_stat):
     return df
 
 
-
-
-
 def save_output_excel(df, fname=None, verbose=False):
+
+    """
+    This function saves the processed dataframe to an excel file. The location and name of the file can be specified
+    by providing the 'fname' parameter. The function also has an option to remove certain columns from the dataframe
+    before saving, by setting the 'verbose' parameter to False.
+
+    Parameters:
+    - df (pandas dataframe): The dataframe that needs to be saved
+    - fname (str, optional): The location and name of the excel file. Default is 'result.xlsx'
+    - verbose (bool, optional): A flag to indicate if certain columns should be removed from the dataframe before saving.
+                                Default is False
+
+    Returns:
+    - None
+    """
+
     # Move the feedback section at the last column for readability
     df.insert(len(df.columns) - 1, 'feedback', df.pop('feedback'))
     df.insert(len(df.columns) - 1, 'justification_annom', df.pop('justification_annom'))
@@ -105,19 +183,25 @@ def save_output_excel(df, fname=None, verbose=False):
     # dgroup_name
 
     df.to_excel(fname, index=0)
+
+
 def check_missing_infomation(df):
-    '''
-    TODO:
-    Sometime, for manual data entry, the student ID and peer ID is missing,
-    for the time being, we drop student/peer with ID.
+    """
+        TODO:
 
-    However, we should raise warning for this serious issue
+        This function checks for missing information in the dataframe, specifically the student ID and peer ID. If any
+        missing values are found, they will be dropped from the dataframe. This function also raises a warning for
+        this serious issue.
 
-    :param df:
-    :return:
-    '''
+        Parameters:
+        - df (pandas dataframe): The dataframe to be checked for missing information
+
+        Returns:
+        - df (pandas dataframe): The dataframe with missing information removed
+        """
     df = df.dropna()
     return df
+
 
 def calculate_factors(df_raw, scale_type):
     """
@@ -152,13 +236,14 @@ def calculate_factors(df_raw, scale_type):
 
     return df
 
+
 if __name__ == '__main__':
     # fexcel=r'C:\Users\balandongiv\IdeaProjects\krr\peer_assessment\peer_assessment.xlsx'
     # fexcel = r'C:\Users\balandongiv\IdeaProjects\krr\peer_assessment\peer_assessment_7_scale.xlsx'
     # fexcel = r'C:\Users\balandongiv\IdeaProjects\krr\peer_assessment\peer_transform.xlsx'
-    fexcel=r'C:\Users\balandongiv\IdeaProjects\pygla\unit_test\peer_transform _22_23_fill.xlsx'
+    fexcel = r'C:\Users\balandongiv\IdeaProjects\pygla\unit_test\peer_transform _22_23_fill.xlsx'
     df = read_file_transform(fexcel)
-    df=check_missing_infomation(df)
+    df = check_missing_infomation(df)
     df1 = calculate_factors(df, scale_type=5)
 
     save_output_excel(df1, fname='2023_11.xlsx', verbose=False)
