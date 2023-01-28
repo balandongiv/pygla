@@ -1,28 +1,23 @@
 import pandas as pd
 from itertools import product
 
-from gla.ref_map import CONST_VAL, COL_NAME, N_ELEMENT, D_AGG_CALCULATION, DROP_COLS_OPT
+from gla.ref_map import CONST_VAL, COL_NAME, N_ELEMENT, D_AGG_CALCULATION, COLS_OPT,LEN_COLS_MQUIZ
 
 import argparse
 
 # produce a more compact, efficient, PEP-compliant code using the following python code?
 # improve the current docstring but maintain the meaning of the old docstring
+
+
 def extract_each_peers(df, dcols, std_col):
-    """
-    This function extracts specific columns from a given dataframe and renames the columns.
 
-    Parameters:
-    - df (pandas dataframe): The dataframe that needs to be processed
-    - dcols (list): A list of column indices that need to be extracted from the dataframe
-    - std_col (list): A list of column indices that will be included in the extracted dataframe along with dcols
+    column_indices = list(std_col) + list(dcols)
+    # Extract columns
+    dd = df.iloc[:, column_indices]
+    # Rename columns
+    dd.columns = COL_NAME
 
-    Returns:
-    - pandas dataframe: The extracted dataframe with renamed columns.
-
-    """
-    expanded_col = std_col + dcols
-    return df.iloc[:, expanded_col].rename(columns=COL_NAME)
-
+    return dd
 
 def collapse_cols_representation(df, cols):
     """
@@ -45,7 +40,7 @@ def collapse_cols_representation(df, cols):
     all_df = [extract_each_peers(df, dcols, std_col) for dcols in col_int]
     df1 = pd.concat(all_df).reset_index(drop=True)
     for delement in N_ELEMENT:
-        df1[delement] = df1[delement].str.extract('\((\d+)\)')
+        df1[delement] = df1[delement].str.extract(r'(\d+)')
     return df1
 
 
@@ -67,7 +62,7 @@ def read_file_transform(finput=None):
     """
     df = pd.read_excel(finput)
     cols = df.columns.tolist()
-    return collapse_cols_representation(df, cols) if len(cols) > 13 else df
+    return collapse_cols_representation(df, cols) if len(cols) > LEN_COLS_MQUIZ else df
 
 
 def convert_percentage_weightage(df, scale_type=None):
@@ -266,10 +261,10 @@ def create_parser():
 
 if __name__ == '__main__':
 
-    # fexcel=r'C:\Users\balandongiv\IdeaProjects\krr\peer_assessment\peer_assessment.xlsx'
+    fexcel=r'C:\Users\balandongiv\IdeaProjects\pygla\unit_test\peer_assessment.xlsx'
     # fexcel = r'C:\Users\balandongiv\IdeaProjects\krr\peer_assessment\peer_assessment_7_scale.xlsx'
     # fexcel = r'C:\Users\balandongiv\IdeaProjects\krr\peer_assessment\peer_transform.xlsx'
-    fexcel = r'C:\Users\balandongiv\IdeaProjects\pygla\unit_test\peer_transform _22_23_fill.xlsx'
+    # fexcel = r'C:\Users\balandongiv\IdeaProjects\pygla\unit_test\peer_transform _22_23_fill.xlsx'
     df = read_file_transform(fexcel)
     df = check_missing_infomation(df)
     df1 = calculate_factors(df, scale_type=5)

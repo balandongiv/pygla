@@ -1,3 +1,6 @@
+
+LEN_COLS_MQUIZ=13
+
 COLS_OPT = [
     ['std_name',
      'research_information_gathering',
@@ -42,6 +45,11 @@ COL_NAME = [
     "peer_name", "peer_student_id", "research_information_gathering", "creative_input",
     "cooperation_within_group", "communication", "contribution_quality", "meeting_attendance", "justification"
 ]
+
+# ['id','start_time','completion_time','email','name','group_name','peer_name',
+#  'peer_student_id','research_information_gathering','creative_input',
+#  'cooperation_within_group','communication','contribution_quality',
+#  'meeting_attendance','justification']
 
 N_ELEMENT = [
     "research_information_gathering", "creative_input", "cooperation_within_group",

@@ -56,8 +56,13 @@ const_val = dict(research_information_gathering=15,
 
 
 def extract_each_peers(df, dcols, std_col):
+    col_name=['id','start_time','completion_time','email','name','f','group_name','peer_name',
+              'peer_student_id','research_information_gathering','creative_input',
+              'coperation_within_group','communication','contribution_quality',
+              'meeting_attendance','justification']
     expanded_col = list(std_col) + list(dcols)
-    dd = df.iloc[:, expanded_col]
+    dd= df.iloc[:, expanded_col]
+
     dd.columns = col_name
     return dd
 
@@ -76,9 +81,8 @@ def collapse_cols_representation(df, cols):
 
     df1 = pd.concat(all_df).reset_index(drop=True)
 
-
     for delement in n_element:
-        df1[delement] = df1[delement].str.extract('\((\d+)\)')
+        df1[delement] = df1[delement].str.extract(r'(\d+)')
 
     # df1.replace(remap_values, inplace=True)
 
@@ -223,10 +227,11 @@ def check_missing_infomation(df):
 
 
 if __name__ == '__main__':
+    fexcel=r'C:\Users\balandongiv\IdeaProjects\pygla\unit_test\peer_assessment.xlsx'
     # fexcel=r'C:\Users\balandongiv\IdeaProjects\krr\peer_assessment\peer_assessment.xlsx'
     # fexcel = r'C:\Users\balandongiv\IdeaProjects\krr\peer_assessment\peer_assessment_7_scale.xlsx'
     # fexcel = r'C:\Users\balandongiv\IdeaProjects\krr\peer_assessment\peer_transform.xlsx'
-    fexcel=r'C:\Users\balandongiv\IdeaProjects\krr\peer_assessment\peer_transform _22_23_fill.xlsx'
+    # fexcel=r'C:\Users\balandongiv\IdeaProjects\krr\peer_assessment\peer_transform _22_23_fill.xlsx'
     df = read_file_transform(fexcel)
     df=check_missing_infomation(df)
     df1 = calculate_factors(df, scale_type=5)

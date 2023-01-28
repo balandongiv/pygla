@@ -2,7 +2,8 @@ import pandas as pd
 from itertools import product
 
 def read_file_transform():
-    df=pd.read_excel(r'C:\Users\balandongiv\IdeaProjects\krr\peer_assessment\peer_assessment.xlsx')
+    fexcel=r'C:\Users\balandongiv\IdeaProjects\pygla\unit_test\peer_assessment.xlsx'
+    df=pd.read_excel(fexcel)
     cols=df.columns.tolist()
 
     col_int=[range(6,15),
