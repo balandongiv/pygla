@@ -12,7 +12,7 @@ class PeerEvaluator:
 
         self.scale_type = scale_type
         self.col_name = COL_NAME
-        self.n_element = N_ELEMENT
+        self.elements_to_extract = N_ELEMENT
         self.d_agg_calculation = D_AGG_CALCULATION
         self.cols_opt = COLS_OPT
         self.df_agg = []
@@ -20,18 +20,18 @@ class PeerEvaluator:
         self.agg_df = []
         self.df = self.read_file_transform(finput)
 
-    def extract_each_peers(self, df, dcols, std_col):
+    def extract_columns(self, df, columns, std_cols):
         """
         Extract specific columns from the dataframe, rename the columns and return the extracted dataframe.
         Parameters:
         - dcols (list): A list of column indices that need to be extracted from the dataframe
         - std_col (list): A list of column indices that will be included in the extracted dataframe along with dcols
         """
-        column_indices = list(std_col) + list(dcols)
-        dd = df.iloc[:, column_indices]
-        # Rename columns
-        dd.columns = self.col_name
-        return dd
+        column_indices = list(std_cols) + list(columns)
+        extracted_df = df.iloc[:, column_indices]
+        extracted_df.columns = self.col_name
+        return extracted_df
+
 
     def collapse_cols_representation(self, df):
         """
@@ -40,16 +40,16 @@ class PeerEvaluator:
         - cols (list): A list of column names in the dataframe
         """
         cols = df.columns
-        indices_s = [i for i, s in enumerate(cols) if 'Peer Name' in s]
-        indices_e = [i for i, s in enumerate(cols) if 'Justification for Peer' in s]
-        indices_e = [x + 1 for x in indices_e]
-        col_int = [range(start, end) for start, end in zip(indices_s, indices_e)]
-        std_col = range(0, indices_s[0])
-        all_df = [self.extract_each_peers(df, dcols, std_col) for dcols in col_int]
-        df1 = pd.concat(all_df).reset_index(drop=True)
-        for delement in self.n_element:
-            df1[delement] = df1[delement].str.extract(r'(\d+)')
-        return df1
+        start_indices = [i for i, col in enumerate(cols) if 'Peer Name' in col]
+        end_indices = [i for i, col in enumerate(cols) if 'Justification for Peer' in col]
+        end_indices = [x + 1 for x in end_indices]
+        columns_to_int = [range(start, end) for start, end in zip(start_indices, end_indices)]
+        std_cols = range(0, start_indices[0])
+        all_df = [self.extract_columns(df, dcols, std_cols) for dcols in columns_to_int]
+        df = pd.concat(all_df).reset_index(drop=True)
+        for element in self.elements_to_extract:
+            df[element] = df[element].str.extract(r'(\d+)')
+        return df
 
     def read_file_transform(self, finput=None):
         """
@@ -81,13 +81,12 @@ class PeerEvaluator:
         cols = pd.Index(CONST_VAL.keys())
         mi = pd.MultiIndex.from_product([['percentage_trans'], cols])
         self.df[mi] = self.df[cols] * pd.Series(CONST_VAL) / revise_max_val
-        # self.df = df
-        # return self.df
+
 
     def aggregate_each_peers(self):
 
         df = self.df.copy(deep=True)
-        col_to_sum = list(product(['percentage_trans'], self.n_element))
+        col_to_sum = list(product(['percentage_trans'], self.elements_to_extract))
         df[('sum_percentage_all_elements')] = df[col_to_sum].sum(axis=1)
         df['row_const'] = 1  # Use to calculate the number of group members
 
@@ -152,13 +151,13 @@ class PeerEvaluator:
 
      """
         # df=self.df
-        n_element = self.n_element
+        # n_element = self.n_element
         self.df["feedback"] = self.df["name"].str.cat(self.df["justification"], sep="-->")
         self.df["justification"] = "'" + self.df["justification"].astype(str) + "'"
         self.df = self.df.set_index(["peer_student_id", "assessor_student_id"])
         self.df = self.df.sort_index(ascending=True)
         self.df.index = pd.MultiIndex.from_tuples(self.df.index.tolist())
-        self.df[n_element] = self.df[n_element].astype(int)
+        self.df[self.elements_to_extract] = self.df[self.elements_to_extract].astype(int)
         self.df["justification_annom"] = self.df["justification"].astype(str)
 
         # self.agg_df = self.df.groupby(level=0).agg(D_AGG_CALCULATION)
