@@ -3,19 +3,13 @@ from itertools import product
 
 import pandas as pd
 
-from helper import save_output_excel
-from ref_map import CONST_VAL, COL_NAME, N_ELEMENT, D_AGG_CALCULATION, COLS_OPT
-
-
-# produce a more compact, efficient, PEP-compliant code using the following python code?
-# improve the current docstring but maintain the meaning of the old docstring
-#
+from gla.helper import save_output_excel
+from gla.ref_map import CONST_VAL, COL_NAME, N_ELEMENT, D_AGG_CALCULATION, COLS_OPT
 
 
 class PeerEvaluator:
     def __init__(self, finput, scale_type=None):
 
-        # self.df = df
         self.scale_type = scale_type
         self.col_name = COL_NAME
         self.n_element = N_ELEMENT
@@ -39,12 +33,13 @@ class PeerEvaluator:
         dd.columns = self.col_name
         return dd
 
-    def collapse_cols_representation(self, df, cols):
+    def collapse_cols_representation(self, df):
         """
         Extract specific columns from the dataframe, concatenate them, extract digits from the concatenated column and return the processed dataframe.
         Parameters:
         - cols (list): A list of column names in the dataframe
         """
+        cols = df.columns
         indices_s = [i for i, s in enumerate(cols) if 'Peer Name' in s]
         indices_e = [i for i, s in enumerate(cols) if 'Justification for Peer' in s]
         indices_e = [x + 1 for x in indices_e]
@@ -69,8 +64,8 @@ class PeerEvaluator:
 
         """
         df = pd.read_excel(finput)
-        cols = df.columns.tolist()
-        return self.collapse_cols_representation(df, cols) if len(cols) > 13 else df
+        # cols = df.columns.tolist()
+        return self.collapse_cols_representation(df) if df.shape[1]> 13 else df
 
     def convert_percentage_weightage(self):
         """
@@ -82,15 +77,15 @@ class PeerEvaluator:
         if self.scale_type not in (5, 7):
             raise ValueError('Please input a valid scale type: 5 or 7, to avoid normalization error')
         revise_max_val = 6 if self.scale_type == 7 else 4
-        df = self.df
+        # df = self.df
         cols = pd.Index(CONST_VAL.keys())
         mi = pd.MultiIndex.from_product([['percentage_trans'], cols])
-        df[mi] = df[cols] * pd.Series(CONST_VAL) / revise_max_val
-        self.df = df
-        return self.df
+        self.df[mi] = self.df[cols] * pd.Series(CONST_VAL) / revise_max_val
+        # self.df = df
+        # return self.df
 
     def aggregate_each_peers(self):
-        # a=self.df.groupby(level=0).agg(D_AGG_CALCULATION)
+
         df = self.df.copy(deep=True)
         col_to_sum = list(product(['percentage_trans'], self.n_element))
         df[('sum_percentage_all_elements')] = df[col_to_sum].sum(axis=1)
@@ -203,9 +198,10 @@ class PeerEvaluator:
 
 
 def create_parser():
-    fexcel = r'C:\Users\balandongiv\IdeaProjects\pygla\unit_test\peer_assessment.xlsx'
+    # fexcel = r'C:\Users\balandongiv\IdeaProjects\pygla\unit_test\peer_assessment.xlsx'
     parser = argparse.ArgumentParser(description='Process peer assessment data')
-    parser.add_argument('finput', type=str, help='file name of the excel file to be processed')
+    parser.add_argument('finput', type=str,help='file name of the excel file to be processed')
+    parser.add_argument('foutput', type=str, default='individual_score.xlsx',help='file name of the excel file to be processed')
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='include additional information in the output file')
     parser.add_argument('-f', '--fname', type=str, default='result.xlsx', help='output file name')
