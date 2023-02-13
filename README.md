@@ -6,11 +6,15 @@
  
 There are two options for installing `pygla`:
 - You can install the latest stable version of `pygla` using pip in the terminal:
-  `pip install pygla`
+  
+
+              `pip install pygla`
+
+
 - Latest Code:
   To get the latest code, you can use the following command:
 
-`pip install -U https://github.com/balandongiv/pygla.git`
+  `pip install -U https://github.com/balandongiv/pygla.git`
 
 # How to Get Started?
 - You can begin by visiting the Google Colab Notebook, which is available in the `tutorial` folder.
