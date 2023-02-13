@@ -1,4 +1,17 @@
-﻿# Significant
+﻿# About the package
+
+PyGLA, or the Python Group Learning Assessment, is a library package designed to facilitate group-based learning and assess the individual contributions within a group. This approach is based on the findings presented in the paper "The Evolution of a Peer Assessment Method for use in Group-based Teaching of HCI," which provides in-depth information about the concept and its implementation.
+
+# How to use the package?
+ You can either
+ 
+- To install the latest stable version of MNE-Python, you can use pip in a terminal:
+
+  `pip install pygla`
+- Get the latest code
+`pip install -U https://github.com/balandongiv/pygla.git`
+
+# Significant
 
 The pygla system is a python-based implementation of the "The Evolution of a Peer Assessment Method for use in Group based Teaching of HCI." pygla stands for Pythonic-Based Group Learning Assessment. This new system serves as an upgrade from the previous Microsoft architecture-based implementation. The previous implementation was limited in several ways. Firstly, manual data entry of each entry from the Microsoft Word form into the excel template was time-consuming and complex. This manual approach was also prone to human error and limited to domain experts. With new teaching assistants every semester, the module convener had to constantly conduct or explain the procedure multiple times.
 
