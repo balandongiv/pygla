@@ -13,7 +13,7 @@ from gla.gla import PeerEvaluator
 from gla.helper import save_output_excel
 
 # Input excel file path and scale type
-fexcel = r'C:\Users\balandongiv\IdeaProjects\pygla\unit_test\peer_assessment_word2excel.xlsx'
+fexcel = r'C:\Users\balandongiv\IdeaProjects\pygla\doc\peer_transform _22_23_fill.xlsx'
 scale_type=5
 
 # Create instance of PeerEvaluator class and process dataframe
