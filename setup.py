@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='pygla',
-      version='0.0.1',
+      version='0.0.2',
       description='Automate group learning assessment',
       author='rpb',
       author_email = 'balandongiv@gmail.com',
