@@ -1,2 +1,3 @@
 # pygla
-Python Group Learning Assessment (PyGLA) is a library package name that reflects the concept of group-based learning and assessing individual contributions within the group. More detail available on the paper "The Evolution of a Peer Assessment Method for use in Groupbased Teaching of HCI"
+
+PyGLA, or the Python Group Learning Assessment, is a library package designed to facilitate group-based learning and assess the individual contributions within a group. This approach is based on the findings presented in the paper "The Evolution of a Peer Assessment Method for use in Group-based Teaching of HCI," which provides in-depth information about the concept and its implementation.
