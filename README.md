@@ -5,7 +5,7 @@
 
  
 There are two options for installing `pygla`:
-- You can install the latest stable version of PyGLA using pip in the terminal:
+- You can install the latest stable version of `pygla` using pip in the terminal:
   `pip install pygla`
 - Latest Code:
   To get the latest code, you can use the following command:
