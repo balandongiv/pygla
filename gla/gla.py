@@ -74,6 +74,8 @@ class PeerEvaluator:
         Parameters:
         - scale_type (int): The type of scale to be used (5 or 7)
         """
+        constant_val=1
+        self.df[N_ELEMENT] = self.df[N_ELEMENT] - constant_val
         if self.scale_type not in (5, 7):
             raise ValueError('Please input a valid scale type: 5 or 7, to avoid normalization error')
         revise_max_val = 6 if self.scale_type == 7 else 4

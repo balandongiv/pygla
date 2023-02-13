@@ -5,20 +5,28 @@ This module includes two classes: PeerEvaluator and helper. The PeerEvaluator cl
 
 To use the module, first import the PeerEvaluator class and the save_output_excel function from the helper class. Then, specify the input excel file path and the scale type. Create an instance of the PeerEvaluator class and run the process_dataframe method to calculate scores. Finally, use the save_output_excel function to save the scores to an output excel file.
 
+
+
 """
 
 # Usage
 
 from gla.gla import PeerEvaluator
 from gla.helper import save_output_excel
+import pandas as pd
 
-# Input excel file path and scale type
-fexcel = r'C:\Users\balandongiv\IdeaProjects\pygla\unit_test\peer_assessment_word2excel.xlsx'
-scale_type=5
+fpath_excel = r'C:\Users\balandongiv\IdeaProjects\pygla\doc\understanding_concept_excel_formula.xlsx'
+
+fexcel='understand_concept.xlsx'
+df = pd.read_excel(fpath_excel, sheet_name="input_data_scale_7")
+df.to_excel(fexcel, index=0)
+
+
+scale_type=7
 
 # Create instance of PeerEvaluator class and process dataframe
 PE = PeerEvaluator(finput=fexcel, scale_type=scale_type)
 PE.process_dataframe()
 
 # Save output to excel file
-save_output_excel(PE.cal_score, fname='output.xlsx', verbose=False)
+save_output_excel(PE.cal_score, fname='understand_concept.xlsx', verbose=True)
