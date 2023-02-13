@@ -1,4 +1,6 @@
 
+from gla.gla import PeerEvaluator
+from gla.helper import save_output_excel
 
 fexcel = r'C:\Users\balandongiv\IdeaProjects\pygla\unit_test\peer_transform _22_23_fill.xlsx'
 peer_evaluator = PeerEvaluator(pd.read_excel(fexcel))

@@ -217,4 +217,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
     PE = PeerEvaluator(finput=args.finput, scale_type=args.scale_type)
     PE.process_dataframe()
-    save_output_excel(PE.cal_score, fname='_11.xlsx', verbose=False)
+    save_output_excel(PE.cal_score, fname='output.xlsx', verbose=False)
