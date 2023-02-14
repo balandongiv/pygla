@@ -63,8 +63,10 @@ class PeerEvaluator:
 
 
         """
-        df = pd.read_excel(finput)
-        # cols = df.columns.tolist()
+        if isinstance(finput, pd.DataFrame):
+            df=finput
+        else:
+            df = pd.read_excel(finput)
         return self.collapse_cols_representation(df) if df.shape[1]> 13 else df
 
     def convert_percentage_weightage(self):

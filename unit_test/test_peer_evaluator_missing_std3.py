@@ -80,11 +80,9 @@ class TestPeerEvaluator(unittest.TestCase):
                                          'communication', 'contribution_quality', 'meeting_attendance', 'justification'])
 
 
-        self.fpath_excel = 'missing_std3.xlsx'
-        self.df.to_excel(self.fpath_excel)
+        self.fpath_excel = self.df
         self.scale_type = 7
         self.data_bench = DataBenchmark()
-        h=1
 
     def test_equals(self):
         PE = PeerEvaluator(finput=self.fpath_excel, scale_type=self.scale_type)
@@ -101,7 +99,6 @@ class TestPeerEvaluator(unittest.TestCase):
 
         self.assertTrue(df_n.equals(self.data_bench.df_bench), "The two dataframes are not equal")
 
-        os.remove(self.fpath_excel)
 
 if __name__ == '__main__':
     unittest.main()

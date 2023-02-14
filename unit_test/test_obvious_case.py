@@ -32,5 +32,5 @@ PE = PeerEvaluator(finput=fexcel, scale_type=scale_type)
 PE.process_dataframe()
 
 # Save output to excel file
-save_output_excel(PE.cal_score, fname='aunderstand_concept.xlsx', verbose=True)
+save_output_excel(PE.cal_score, fname=fexcel, verbose=True)
 os.remove(fexcel)

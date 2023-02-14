@@ -81,9 +81,9 @@ class TestPeerEvaluator(unittest.TestCase):
                               'STD9 comment to std10', 'STD10 comment to std8', 'STD10 comment to std9']
         }
 
-        self.fpath_excel = 'case_all.xlsx'
+
         self.df = pd.DataFrame(self.data_all)
-        self.df.to_excel(self.fpath_excel)
+        self.fpath_excel=self.df
         self.scale_type = 7
         self.data_bench = DataBenchmark()
 
@@ -96,8 +96,6 @@ class TestPeerEvaluator(unittest.TestCase):
         df_n = df_n.loc[:, self.columns_to_keep].reset_index(drop=True)
 
         self.assertTrue(df_n.equals(self.data_bench.df_bench), "The two dataframes are not equal")
-
-        os.remove(self.fpath_excel)
 
 if __name__ == '__main__':
     unittest.main()
