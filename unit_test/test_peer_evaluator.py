@@ -87,6 +87,7 @@ class TestPeerEvaluator(unittest.TestCase):
         self.scale_type = 7
         self.data_bench = DataBenchmark()
 
+
     def test_equals(self):
         PE = PeerEvaluator(finput=self.fpath_excel, scale_type=self.scale_type)
         PE.process_dataframe()
