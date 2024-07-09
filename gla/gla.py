@@ -76,6 +76,14 @@ class PeerEvaluator:
         Parameters:
         - scale_type (int): The type of scale to be used (5 or 7)
         """
+
+        '''
+        For APID batch 23/24, I mistakenly asign the form with value 0,
+        and when developing the code while in UNM, the lowest is 1,hence the constan_val =1
+    .
+    Next time, the form should start from 1, and not from zero to avoid this kind of issue.
+ 
+        '''
         constant_val=1
         self.df[N_ELEMENT] = self.df[N_ELEMENT] - constant_val
         if self.scale_type not in (5, 7):
@@ -157,6 +165,35 @@ class PeerEvaluator:
         # df=self.df
         # n_element = self.n_element
         self.df["feedback"] = self.df["name"].str.cat(self.df["justification"], sep="-->")
+
+        self.df['peer_student_id']=self.df['peer_student_id'].str.upper()
+        self.df['assessor_student_id']=self.df['assessor_student_id'].str.upper()
+        self.df['peer_student_id_num'] = self.df['peer_student_id'].str.replace('BS', '').astype(int)
+
+        '''
+        For APID batch 23/24, some user input the same peer_student_id, and has
+        been validated manually to be correct, however, mb due to bug by pandas
+        the duplicated is not properly removed. Therefore, I remove the "BS" prefix
+        and convert it to integer, then sort it to make sure the peer_student_id_num
+        '''
+        self.force_unique_numerical_id=True
+        if self.force_unique_numerical_id:
+            # For troubleshooting
+            # Sort by the new 'peer_student_id_num' first, then by 'assessor_student_id'
+            self.df = self.df.sort_values(by=['peer_student_id_num', 'assessor_student_id'])
+
+            # Drop duplicates based on 'peer_student_id_num' and keep the first occurrence
+            self.df = self.df.drop_duplicates(subset=['peer_student_id_num'])
+
+            # Sort the unique peers by 'peer_student_id_num'
+            self.df = self.df.sort_values(by='peer_student_id_num')
+
+            # Select only 'peer_student_id', 'peer_student_id_num', and 'peer_name' columns
+            # self.df = self.df[['peer_student_id', 'peer_student_id_num', 'peer_name']]
+            # self.df.to_csv('unique_peers.csv', index=False)
+            # self.df = self.df.drop(columns=['peer_student_id_num'])
+
+        self.df = self.df.sort_values(by=['peer_student_id', 'assessor_student_id'])
         self.df["justification"] = "'" + self.df["justification"].astype(str) + "'"
         self.df = self.df.set_index(["peer_student_id", "assessor_student_id"])
         self.df = self.df.sort_index(ascending=True)

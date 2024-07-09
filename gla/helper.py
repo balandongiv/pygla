@@ -17,7 +17,11 @@ def save_output_excel(df, fname='result.xlsx', verbose=False):
     Returns:
     - None
     """
-    columns_to_keep=['std_name',
+    df=df.reset_index()
+    columns_to_keep=['std_id',
+                     'weightage',
+                     'group_name',
+                    'std_name',
                      'research_information_gathering',
                      'creative_input',
                      'cooperation_within_group',
@@ -31,7 +35,7 @@ def save_output_excel(df, fname='result.xlsx', verbose=False):
                      'feedback'
                      ]
 
-
+    df=df.sort_values(by=['group_name', 'weightage'], ascending=[True, True])
     if not verbose:
         df = df.loc[:, columns_to_keep]
     # Move 'justification_annom' and 'feedback' to the last columns
