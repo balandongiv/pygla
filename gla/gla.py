@@ -2,9 +2,82 @@ import argparse
 from itertools import product
 
 import pandas as pd
-
+import re
 from gla.helper import save_output_excel
 from gla.ref_map import CONST_VAL, COL_NAME, N_ELEMENT, D_AGG_CALCULATION, COLS_OPT
+def rename_columns(df):
+    df.columns = (
+        df.columns
+        .str.lower()  # Convert to lowercase
+        .str.replace(r'&', 'and', regex=True)  # Replace '&' with 'and'
+        .str.replace(r'[^a-z0-9]', '_', regex=True)  # Replace non-alphanumeric characters with '_'
+        .str.replace(r'_{2,}', '_', regex=True)  # Replace multiple underscores with a single one
+        .str.strip('_')  # Remove leading and trailing underscores
+    )
+    return df
+
+# Function to extract numeric values from strings
+def extract_numeric(value):
+    if isinstance(value, str):  # Ensure it's a string before processing
+        value = value.replace("\xa0", " ")  # Remove non-breaking spaces
+        match = re.search(r"(\d+)", value)  # Extract the first numeric part
+        if match:
+            return int(match.group(1))  # Convert to integer
+    return pd.NA  # Use NA for missing or non-convertible values
+def transform_peer_evaluation(df):
+    """Transform the peer evaluation data into a structured format."""
+    transformed_data = []
+    assessment_components = [
+        "Research & Information Gathering",
+        "Creative Input",
+        "Co-Operation Within Group",
+        "Communication Withing Group",
+        "Quality of Individual Contribution",
+        "Attendance At Meeting"
+    ]
+
+    for _, row in df.iterrows():
+        for i in range(1, 8):  # Assuming up to 7 peers can be evaluated
+            peer_name_col = f'Peer Name (P{i})\n'
+            peer_id_col = f'Peer Student ID (P{i})\n'
+
+            if peer_name_col in df.columns and pd.notna(row[peer_name_col]):
+                peer_data = {
+                    'Id': row['Id'],
+                    'Start time': row['Start time'],
+                    'Completion time': row['Completion time'],
+                    'Email': row['Email'],
+                    'Name': row['Name\n'],
+                    'Group Name': row['Group Name\n'],
+                    'Assessor Student ID': row['assessor student id\n'],
+                    'Peer Name': row[peer_name_col],
+                    'Peer Student ID': row[peer_id_col],
+                }
+
+                for comp in assessment_components:
+                    possible_cols = [
+                        f'Assessment Component\n.{comp}{"" if i == 1 else i-1}',
+                        f'Assessment Component\n.{comp}{i-1}',
+                        f'Assessment Component\n.{comp}{i-1}\n'
+                    ]
+
+                    for col in possible_cols:
+                        if col in df.columns and pd.notna(row[col]):
+                            peer_data[comp] = row[col]
+                            break
+                    else:
+                        peer_data[comp] = None  # Ensure column presence even if missing
+
+                justification_col = f'Justification for Peer (P{i})\n'
+                eval_col = f'Do you want to Evaluate Peer (P{i+1})\n' if i < 7 else None
+
+                peer_data['Justification'] = row.get(justification_col, None)
+                if eval_col and eval_col in df.columns:
+                    peer_data['Do you want to Evaluate Next Peer'] = row.get(eval_col, None)
+
+                transformed_data.append(peer_data)
+
+    return pd.DataFrame(transformed_data)
 
 
 class PeerEvaluator:
@@ -39,16 +112,20 @@ class PeerEvaluator:
         Parameters:
         - cols (list): A list of column names in the dataframe
         """
-        cols = df.columns
-        start_indices = [i for i, col in enumerate(cols) if 'Peer Name' in col]
-        end_indices = [i for i, col in enumerate(cols) if 'Justification for Peer' in col]
-        end_indices = [x + 1 for x in end_indices]
-        columns_to_int = [range(start, end) for start, end in zip(start_indices, end_indices)]
-        std_cols = range(0, start_indices[0])
-        all_df = [self.extract_columns(df, dcols, std_cols) for dcols in columns_to_int]
-        df = pd.concat(all_df).reset_index(drop=True)
-        for element in self.elements_to_extract:
-            df[element] = df[element].str.extract(r'(\d+)')
+        # cols = df.columns
+        # start_indices = [i for i, col in enumerate(cols) if 'Peer Name' in col]
+        # end_indices = [i for i, col in enumerate(cols) if 'Justification for Peer' in col]
+        # end_indices = [x + 1 for x in end_indices]
+        # columns_to_int = [range(start, end) for start, end in zip(start_indices, end_indices)]
+        # std_cols = range(0, start_indices[0])
+        # all_df = [self.extract_columns(df, dcols, std_cols) for dcols in columns_to_int]
+        # df = pd.concat(all_df).reset_index(drop=True)
+        # for element in self.elements_to_extract:
+        #     df[element] = df[element].str.extract(r'(\d+)')
+
+        df=transform_peer_evaluation(df)
+        # df.to_excel('transformed.xlsx', index=False)
+        df = rename_columns(df)
         return df
 
     def read_file_transform(self, finput=None):
@@ -165,10 +242,23 @@ class PeerEvaluator:
         # df=self.df
         # n_element = self.n_element
         self.df["feedback"] = self.df["name"].str.cat(self.df["justification"], sep="-->")
+        if self.df['peer_student_id'].map(type).eq(str).all():
+            self.df['peer_student_id'] = self.df['peer_student_id'].str.upper()
 
-        self.df['peer_student_id']=self.df['peer_student_id'].str.upper()
-        self.df['assessor_student_id']=self.df['assessor_student_id'].str.upper()
-        self.df['peer_student_id_num'] = self.df['peer_student_id'].str.replace('BS', '').astype(int)
+
+        if self.df['assessor_student_id'].map(type).eq(str).all():
+            # self.df['assessor_student_id'] = self.df['assessor_student_id'].str.upper()
+            self.df['peer_student_id_num'] = self.df['assessor_student_id'].str.extract('(\d+)')[0]
+        else:
+            self.df['peer_student_id_num'] = self.df['peer_student_id']
+        # self.df['peer_student_id']=self.df['peer_student_id'].str.upper()
+        # self.df['assessor_student_id']=self.df['assessor_student_id'].str.upper()
+        # self.df['peer_student_id_num'] = self.df['peer_student_id'].str.replace('BS', '').astype(int)
+        # self.df['peer_student_id_num'] = self.df['peer_student_id'].str.replace('BS', '', regex=False)
+        #
+        # # Ensure the values are numeric and handle large numbers gracefully
+        # self.df['peer_student_id_num'] = pd.to_numeric(self.df['peer_student_id_num'], errors='coerce')
+
 
         '''
         For APID batch 23/24, some user input the same peer_student_id, and has
@@ -181,9 +271,13 @@ class PeerEvaluator:
             # For troubleshooting
             # Sort by the new 'peer_student_id_num' first, then by 'assessor_student_id'
             self.df = self.df.sort_values(by=['peer_student_id_num', 'assessor_student_id'])
+            self.df['start_time'] = pd.to_datetime(self.df['start_time'])
+            # Keep the latest start_time for each (assessor_student_id, peer_student_id) pair
+            self.df = self.df.loc[self.df.groupby(['assessor_student_id', 'peer_student_id'])['start_time'].idxmax()]
 
+            self.df = self.df.reset_index(drop=True)
             # Drop duplicates based on 'peer_student_id_num' and keep the first occurrence
-            self.df = self.df.drop_duplicates(subset=['peer_student_id_num'])
+            # self.df = self.df.drop_duplicates(subset=['peer_student_id_num'])
 
             # Sort the unique peers by 'peer_student_id_num'
             self.df = self.df.sort_values(by='peer_student_id_num')
@@ -192,18 +286,33 @@ class PeerEvaluator:
             # self.df = self.df[['peer_student_id', 'peer_student_id_num', 'peer_name']]
             # self.df.to_csv('unique_peers.csv', index=False)
             # self.df = self.df.drop(columns=['peer_student_id_num'])
+        self.df['peer_student_id_validation']=self.df['peer_student_id_num']
+        self.df['peer_student_id'] = self.df['peer_student_id'].astype(str).str.strip()
+        self.df['assessor_student_id'] = self.df['assessor_student_id'].astype(str).str.strip()
 
         self.df = self.df.sort_values(by=['peer_student_id', 'assessor_student_id'])
+
+
+
+
         self.df["justification"] = "'" + self.df["justification"].astype(str) + "'"
         self.df = self.df.set_index(["peer_student_id", "assessor_student_id"])
         self.df = self.df.sort_index(ascending=True)
         self.df.index = pd.MultiIndex.from_tuples(self.df.index.tolist())
-        self.df[self.elements_to_extract] = self.df[self.elements_to_extract].astype(int)
+        # Apply the function to the specified columns
+        self.df[self.elements_to_extract] = self.df[self.elements_to_extract].applymap(extract_numeric)
+
+        # Convert the cleaned data to integers, handling NaNs
+        self.df[self.elements_to_extract] = self.df[self.elements_to_extract].astype("Int64")
+
+        # self.df[self.elements_to_extract] = self.df[self.elements_to_extract].astype(int)
         self.df["justification_annom"] = self.df["justification"].astype(str)
 
         # self.agg_df = self.df.groupby(level=0).agg(D_AGG_CALCULATION)
         self.df = self.df.groupby(level=0).agg(D_AGG_CALCULATION)
+        self.df.to_excel('agg.xlsx', index=True)
         # self.df=df
+        h=1
         # return self.df
 
     def check_missing_infomation(self):
@@ -220,7 +329,13 @@ class PeerEvaluator:
             Returns:
             - df (pandas dataframe): The dataframe with missing information removed
             """
-        self.df = self.df.dropna()
+        # drop column do_you_want_to_evaluate_next_peer
+        # self.df['assessor_student_id'] = self.df['assessor_student_id'].str.strip()
+        self.df['assessor_student_id'] = self.df['assessor_student_id'].apply(lambda x: str(x).strip() if pd.notnull(x) else x)
+
+        self.df = self.df.drop(columns=['do_you_want_to_evaluate_next_peer'])
+        #
+        # self.df = self.df.dropna()
         return self.df
 
     def process_dataframe(self):

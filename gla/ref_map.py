@@ -1,8 +1,12 @@
 
 LEN_COLS_MQUIZ=13
 
+
+
+
 COLS_OPT = [
-    ['std_name',
+    [
+        'std_name',
      'research_information_gathering',
      'creative_input',
      'cooperation_within_group',
@@ -18,14 +22,15 @@ COLS_OPT = [
 ]
 
 D_AGG_CALCULATION = {
+    "peer_student_id_validation": "first",
     "peer_name": "first",
     "group_name": "first",
-    "research_information_gathering": "mean",
+    "research_and_information_gathering": "mean",
     "creative_input": "mean",
-    "cooperation_within_group": "mean",
-    "communication": "mean",
-    "contribution_quality": "mean",
-    "meeting_attendance": "mean",
+    "co_operation_within_group": "mean",
+    "communication_withing_group": "mean",
+    "quality_of_individual_contribution": "mean",
+    "attendance_at_meeting": "mean",
     "feedback": "\n".join,
     "justification_annom": "\n".join
 }
@@ -42,25 +47,41 @@ REMAP_VALUES = {
 
 COL_NAME = [
     "id", "start_time", "completion_time", "email", "name", "assessor_student_id", "group_name",
-    "peer_name", "peer_student_id", "research_information_gathering", "creative_input",
-    "cooperation_within_group", "communication", "contribution_quality", "meeting_attendance", "justification"
+    "peer_name", "peer_student_id",
+    "research_and_information_gathering", "creative_input", "co_operation_within_group",
+    "communication_withing_group", "quality_of_individual_contribution", "attendance_at_meeting",
+    "justification"
 ]
 
-# ['id','start_time','completion_time','email','name','group_name','peer_name',
-#  'peer_student_id','research_information_gathering','creative_input',
-#  'cooperation_within_group','communication','contribution_quality',
-#  'meeting_attendance','justification']
+COLUMN_TO_KEEP=[
+    'std_id',
+                'weightage',
+                'group_name',
+                'std_name',
+                'research_and_information_gathering',
+                'creative_input',
+                'co_operation_within_group',
+                'communication_withing_group',
+                'quality_of_individual_contribution',
+                'attendance_at_meeting',
+                'dgroup_name',
+                'nmember',
+                'weightage',
+                'justification_annom',
+                'feedback'
+                ]
+
 
 N_ELEMENT = [
-    "research_information_gathering", "creative_input", "cooperation_within_group",
-    "communication", "contribution_quality", "meeting_attendance"
+    "research_and_information_gathering", "creative_input", "co_operation_within_group",
+    "communication_withing_group", "quality_of_individual_contribution", "attendance_at_meeting"
 ]
 
 CONST_VAL = {
-    "research_information_gathering": 15,
+    "research_and_information_gathering": 15,
     "creative_input": 20,
-    "cooperation_within_group": 15,
-    "communication": 15,
-    "contribution_quality": 20,
-    "meeting_attendance": 15
+    "co_operation_within_group": 15,
+    "communication_withing_group": 15,
+    "quality_of_individual_contribution": 20,
+    "attendance_at_meeting": 15
 }

@@ -18,7 +18,7 @@ import pandas as pd
 from gla.gla import PeerEvaluator
 from gla.helper import save_output_excel
 
-fpath_excel = r'C:\Users\balandongiv\IdeaProjects\pygla\doc\understanding_concept_excel_formula.xlsx'
+fpath_excel = r'../doc\understanding_concept_excel_formula.xlsx'
 
 fexcel='understand_concept.xlsx'
 df = pd.read_excel(fpath_excel, sheet_name="input_data_scale_7")
@@ -33,4 +33,4 @@ PE.process_dataframe()
 
 # Save output to excel file
 save_output_excel(PE.cal_score, fname=fexcel, verbose=True)
-os.remove(fexcel)
+# os.remove(fexcel)

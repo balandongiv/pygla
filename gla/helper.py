@@ -1,5 +1,5 @@
 
-
+from gla.ref_map import COLUMN_TO_KEEP
 
 
 def save_output_excel(df, fname='result.xlsx', verbose=False):
@@ -18,26 +18,26 @@ def save_output_excel(df, fname='result.xlsx', verbose=False):
     - None
     """
     df=df.reset_index()
-    columns_to_keep=['std_id',
-                     'weightage',
-                     'group_name',
-                    'std_name',
-                     'research_information_gathering',
-                     'creative_input',
-                     'cooperation_within_group',
-                     'communication',
-                     'contribution_quality',
-                     'meeting_attendance',
-                     'dgroup_name',
-                     'nmember',
-                     'weightage',
-                     'justification_annom',
-                     'feedback'
-                     ]
+    # columns_to_keep=['std_id',
+    #                  'weightage',
+    #                  'group_name',
+    #                 'std_name',
+    #                  'research_information_gathering',
+    #                  'creative_input',
+    #                  'cooperation_within_group',
+    #                  'communication',
+    #                  'contribution_quality',
+    #                  'meeting_attendance',
+    #                  'dgroup_name',
+    #                  'nmember',
+    #                  'weightage',
+    #                  'justification_annom',
+    #                  'feedback'
+    #                  ]
 
     df=df.sort_values(by=['group_name', 'weightage'], ascending=[True, True])
     if not verbose:
-        df = df.loc[:, columns_to_keep]
+        df = df.loc[:, COLUMN_TO_KEEP]
     # Move 'justification_annom' and 'feedback' to the last columns
     cols = df.columns.tolist()
     cols = [col for col in cols if col not in ['justification_annom', 'feedback']] + ['justification_annom', 'feedback']
